@@ -13,68 +13,61 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-interface AnalysisResult {
-  bloodSugar: {
-    status: 'Normal' | 'Elevated' | 'High' | 'Low',
-    value: number,
-    recommendation: string
-  },
-  cholesterol: {
-    status: 'Normal' | 'Borderline High' | 'High',
-    value: number,
-    recommendation: string
-  },
-  gout: {
-    status: 'Normal' | 'Elevated' | 'High',
-    value: number,
-    recommendation: string
-  },
-  overallHealth: string,
-  lifestyle: string[]
-}
+import ReactMarkdown from 'react-markdown'
+import { Loader2 } from 'lucide-react'
 
 export function AnalysisButton() {
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
+  const [analysis, setAnalysis] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleAnalysis = async () => {
     setIsLoading(true)
+    setError(null)
+    setAnalysis(null)
+    setIsOpen(true)
     const supabase = createClientComponentClient()
 
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        alert('User not authenticated. Please sign in.')
+        setError('User not authenticated. Please sign in.')
         return
       }
 
       const response = await fetch(`/api/analysis?userId=${user.id}`)
       const data = await response.json()
       
-      if (response.ok) {
-        setAnalysis(data.analysis)
-        setIsOpen(true)  // Open the drawer when analysis is ready
+      if (response.ok && data.analysis) {
+        const mdxContent = convertToMDX(data.analysis)
+        setAnalysis(mdxContent)
       } else {
-        alert('Failed to get analysis. Please try again.')
+        setError(data.error || 'Failed to get analysis. Please try again.')
       }
     } catch (error) {
       console.error('Error during analysis:', error)
-      alert('An error occurred. Please try again.')
+      setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Normal': return 'text-green-500'
-      case 'Elevated': case 'Borderline High': return 'text-yellow-500'
-      case 'High': case 'Low': return 'text-red-500'
-      default: return 'text-gray-500'
-    }
+  const convertToMDX = (text: string) => {
+    // This function converts the plain text to an MDX-like format
+    // You may need to adjust this based on the actual structure of your AI's response
+    const sections = text.split('\n\n')
+    return sections.map(section => {
+      if (section.startsWith('Blood Sugar') || section.startsWith('Cholesterol') || section.startsWith('Gout')) {
+        return `## ${section}\n`
+      } else if (section.startsWith('Overall Health')) {
+        return `## Overall Health Assessment\n\n${section.split(':')[1].trim()}\n`
+      } else if (section.startsWith('Lifestyle Recommendations')) {
+        const recommendations = section.split(':')[1].trim().split('\n')
+        return `## Lifestyle Recommendations\n\n${recommendations.map(rec => `- ${rec.trim()}\n`).join('')}`
+      }
+      return section
+    }).join('\n\n')
   }
 
   return (
@@ -92,64 +85,26 @@ export function AnalysisButton() {
           </DrawerDescription>
         </DrawerHeader>
         <div className="p-4 pb-0 overflow-y-auto max-h-[70vh]">
-          {analysis && (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">🩸 Blood Sugar</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className={`font-bold ${getStatusColor(analysis.bloodSugar.status)}`}>
-                      {analysis.bloodSugar.status} ({analysis.bloodSugar.value} mg/dL)
-                    </p>
-                    <p className="text-sm mt-2">{analysis.bloodSugar.recommendation}</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">🫀 Cholesterol</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className={`font-bold ${getStatusColor(analysis.cholesterol.status)}`}>
-                      {analysis.cholesterol.status} ({analysis.cholesterol.value} mg/dL)
-                    </p>
-                    <p className="text-sm mt-2">{analysis.cholesterol.recommendation}</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">🦶 Gout</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className={`font-bold ${getStatusColor(analysis.gout.status)}`}>
-                      {analysis.gout.status} ({analysis.gout.value} mg/dL)
-                    </p>
-                    <p className="text-sm mt-2">{analysis.gout.recommendation}</p>
-                  </CardContent>
-                </Card>
-              </div>
-              <Card className="mb-4">
-                <CardHeader>
-                  <CardTitle className="text-lg">🏥 Overall Health</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{analysis.overallHealth}</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">🌿 Lifestyle Recommendations</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="list-disc pl-5">
-                    {analysis.lifestyle.map((recommendation, index) => (
-                      <li key={index} className="text-sm mb-1">{recommendation}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </>
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-center text-sm text-muted-foreground">
+                Generating your personalized health analysis...
+                <br />
+                This may take a few moments.
+              </p>
+            </div>
+          )}
+          {error && (
+            <p className="text-red-500 mb-4">{error}</p>
+          )}
+          {analysis && !isLoading && (
+            <div className="prose prose-sm max-w-none dark:prose-invert">
+              <ReactMarkdown>{analysis}</ReactMarkdown>
+            </div>
+          )}
+          {!analysis && !error && !isLoading && (
+            <p>No analysis data available. Try running the analysis again.</p>
           )}
         </div>
         <DrawerFooter>

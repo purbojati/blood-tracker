@@ -1,16 +1,11 @@
+// app/api/analysis/route.ts
+
 import { NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-// Initialize the Google Generative AI client
-// Check if the environment variable is defined
-if (!process.env.GOOGLE_AI_API_KEY) {
-  // Handle the case where the environment variable is not defined
-  // You can throw an error, log a warning, or return a default response
-  throw new Error('GOOGLE_AI_API_KEY environment variable is not defined');
-}
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -20,67 +15,69 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
   }
 
-  const supabase = createRouteHandlerClient({ cookies })
+  try {
+    const supabase = createRouteHandlerClient({ cookies })
 
-  // Fetch the last 7 data inputs and user profile
-  const { data: profile, error: profileError } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single();
+    const { data: bloodTests, error: bloodTestsError } = await supabase
+      .from('blood_tests')
+      .select('*')
+      .eq('user_id', userId)
+      .order('test_date', { ascending: false })
+      .limit(7)
 
-  if (profileError) {
-    return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 })
-  }
+    if (bloodTestsError || !bloodTests || bloodTests.length === 0) {
+      return NextResponse.json({ error: 'Failed to fetch blood tests or no data found' }, { status: 404 })
+    }
 
-  // Fetch the last 7 data inputs
-  // ... (fetch data from Supabase as before)
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('age, gender, country, language')
+      .eq('id', userId)
+      .single()
 
-   // Fetch the latest blood test
-   const { data: latestTest, error: latestTestError } = await supabase
-   .from('blood_tests')
-   .select('*')
-   .eq('user_id', userId)
-   .order('created_at', { ascending: false })
-   .limit(1)
-   .single();
+    if (profileError) {
+      return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 })
+    }
 
- if (latestTestError) {
-   return NextResponse.json({ error: 'Failed to fetch latest blood test data' }, { status: 500 });
- }
-
-  // Prepare the prompt for Gemini
-  const prompt = `Analyze the following blood test results for a ${profile.age}-year-old ${profile.gender}:
+    const latestTest = bloodTests[0]
+    const prompt = `You're a doctor, analyze the following blood test results for a ${profile.age}-year-old ${profile.gender} from ${profile.country} in ${profile.language} language:
     Blood Sugar: ${latestTest.blood_sugar} mg/dL
     Cholesterol: ${latestTest.cholesterol} mg/dL
     Gout: ${latestTest.gout} mg/dL
-    
-    Provide an analysis including:
-    1. Status and recommendation for each metric
-    2. Overall health assessment
-    3. Lifestyle recommendations
-  `;
 
-  try {
-    // Call Gemini API
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    Provide an analysis in the following format:
+
+    Blood Sugar:
+    [Status]
+    [Value]
+    [Short recommendation]
+
+    Cholesterol:
+    [Status]
+    [Value]
+    [Short recommendation]
+
+    Gout:
+    [Status]
+    [Value]
+    [Short recommendation]
+
+    Overall Health Assessment:
+    [A comprehensive assessment of overall health based on these metrics, considering age, gender, country]
+
+    Lifestyle Recommendations:
+    - [Lifestyle Recommendation]
+
+    Ensure the recommendations are tailored to the specific values and the user's age, gender, country.`
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const analysisText = response.text();
 
-    // Parse the Gemini response and structure it according to your AnalysisResult interface
-    // This part would depend on how you structure the Gemini prompt and response
-    const analysis = parseGeminiResponse(analysisText);
-
-    return NextResponse.json({ analysis })
+    return NextResponse.json({ analysis: analysisText })
   } catch (error) {
-    console.error('Error calling Gemini API:', error);
-    return NextResponse.json({ error: 'Failed to generate analysis' }, { status: 500 })
+    console.error('Unexpected error in analysis API:', error)
+    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })
   }
-}
-
-function parseGeminiResponse(responseText: string) {
-  // Implement parsing logic here to convert the Gemini text response
-  // into the structured AnalysisResult object
-  // This would involve natural language processing or a structured response format from Gemini
 }

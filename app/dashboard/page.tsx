@@ -62,9 +62,9 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 mx-4 mt-4">
         <AddDataSheet />
       </div>
-      <div className="grid gap-4 p-4">
+      <div className="grid gap-4 p-4 mb-40">
         <MetricChart
-          title="Blood Sugar"
+          title="🩸 Blood Sugar"
           data={bloodSugarData}
           color="hsl(var(--chart-1))"
           unit="mg/dL"
@@ -72,7 +72,7 @@ export default function Dashboard() {
           description="Blood Sugar Level"
         />
         <MetricChart
-          title="Cholesterol"
+          title="🫀 Cholesterol"
           data={cholesterolData}
           color="hsl(var(--chart-2))"
           unit="mg/dL"
@@ -80,7 +80,7 @@ export default function Dashboard() {
           description="Cholesterol Level"
         />
         <MetricChart
-          title="Gout"
+          title="🦶 Gout"
           data={goutData}
           color="hsl(var(--chart-3))"
           unit="mg/dL"
