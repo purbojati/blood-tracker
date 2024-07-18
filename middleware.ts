@@ -5,26 +5,21 @@ import type { NextRequest } from 'next/server'
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
+  
+  console.log('Middleware: Checking session')
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  console.log('Middleware: Session status', { exists: !!session })
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  // Check if the user is authenticated
-  if (!session) {
-    // If the user is not authenticated and trying to access a protected route, redirect to the root
-    const protectedRoutes = ['/dashboard', '/history', '/profile']
-    if (protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route))) {
-      const redirectUrl = req.nextUrl.clone()
-      redirectUrl.pathname = '/'
-      redirectUrl.searchParams.set(`redirectedFrom`, req.nextUrl.pathname)
-      return NextResponse.redirect(redirectUrl)
-    }
+  // If there's no session and the user is trying to access a protected route, redirect to login
+  if (!session && !req.nextUrl.pathname.startsWith('/auth')) {
+    console.log('Middleware: Redirecting to login')
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
   return res
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|auth/callback).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }
