@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
+const nextConfig = {
+    reactStrictMode: true,
+    env: {
+      GOOGLE_AI_API_KEY: process.env.GOOGLE_AI_API_KEY,
+    },
+  };
+  
 export default nextConfig;
