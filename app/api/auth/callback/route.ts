@@ -11,9 +11,6 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // Get the redirectedFrom parameter if it exists
-  const redirectedFrom = requestUrl.searchParams.get('redirectedFrom')
-  
-  // Redirect to the original intended page or dashboard if not specified
-  return NextResponse.redirect(new URL(redirectedFrom || '/dashboard', requestUrl.origin))
+  // URL to redirect to after sign in process completes
+  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
 }
