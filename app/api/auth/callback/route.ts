@@ -6,21 +6,17 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
 
-  console.log('Auth callback reached', { code: code ? 'exists' : 'missing' })
-
   if (code) {
     const supabase = createRouteHandlerClient({ cookies })
     try {
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-      console.log('Exchange code for session result', { data: !!data, error })
-      if (error) throw error
+      await supabase.auth.exchangeCodeForSession(code)
+      return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
     } catch (error) {
-      console.error('Error in exchangeCodeForSession:', error)
-      // Instead of throwing, let's redirect to a specific error page
-      return NextResponse.redirect(new URL('/auth-exchange-error', requestUrl.origin))
+      console.error('Error in auth callback:', error)
+      return NextResponse.redirect(new URL('/auth-error', requestUrl.origin))
     }
   }
 
-  console.log('Redirecting to dashboard')
-  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
+  console.error('Auth callback: No code provided')
+  return NextResponse.redirect(new URL('/', requestUrl.origin))
 }

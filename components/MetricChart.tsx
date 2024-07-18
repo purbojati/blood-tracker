@@ -35,7 +35,7 @@ export function MetricChart({ title, description, data, color, unit, trend }: Me
   } satisfies ChartConfig
 
   return (
-    <Card className="flex flex-col gap-4">
+    <Card className="grid grid-cols-1 gap-4">
       <CardHeader>
         <CardTitle className="text-lg">{title}</CardTitle>
       </CardHeader>
