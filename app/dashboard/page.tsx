@@ -27,18 +27,17 @@ export default function Dashboard() {
       const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
-        router.push('/login')
-        return
+        // router.push('/login')
+        // return
       }
 
       try {
         const { data, error } = await supabase
           .from('blood_tests')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', user?.id) // Added optional chaining here
           .order('test_date', { ascending: false })
           .limit(7)
-
         if (error) throw error
 
         if (data) {

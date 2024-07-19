@@ -8,20 +8,9 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = createRouteHandlerClient({ cookies })
-    try {
-      await supabase.auth.exchangeCodeForSession(code)
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
-      } else {
-        return NextResponse.redirect(new URL('/login', requestUrl.origin))
-      }
-    } catch (error) {
-      console.error('Error in auth callback:', error)
-      return NextResponse.redirect(new URL('/login', requestUrl.origin))
-    }
+    await supabase.auth.exchangeCodeForSession(code)
   }
 
-  console.error('Auth callback: No code provided')
-  return NextResponse.redirect(new URL('/login', requestUrl.origin))
+  // Redirect to the base URL after sign in process completes
+  return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL || requestUrl.origin)
 }

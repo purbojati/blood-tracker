@@ -74,7 +74,7 @@ export function ProfileForm() {
     }
 
     fetchProfile()
-  }, [supabase])
+  }, [supabase, form]) // Added 'form' to the dependency array
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

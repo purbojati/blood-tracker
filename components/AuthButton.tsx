@@ -1,44 +1,59 @@
-'use client';
+'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { Button } from '@/components/ui/button' // Assuming you're using shadcn/ui
+import { useRouter } from 'next/navigation'
+import { User } from '@supabase/supabase-js'
 
 export function AuthButton() {
-  const [user, setUser] = useState<null | { id: string; email: string; }>(null)
-  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
   const supabase = createClientComponentClient()
+  const router = useRouter()
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        (event, session) => {
-            setUser(session?.user ? { ...session.user, email: session.user.email ?? '' } : null)
-          }
-        )
+      (event, session) => {
+        setUser(session?.user ?? null)
+      }
+    )
 
     return () => subscription.unsubscribe()
   }, [supabase])
 
   const handleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) console.error('Error signing in:', error)
-  }
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
+          skipBrowserRedirect: true,
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Error signing in:', error);
+    }
+  };
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) console.error('Error signing out:', error)
-    else router.push('/')
+    router.push(process.env.NEXT_PUBLIC_BASE_URL || '/')
   }
 
   return user ? (
-    <Button onClick={handleSignOut}>Sign Out</Button>
+    <div className="flex justify-center">
+      <Button variant="secondary" onClick={handleSignOut}>Sign Out</Button>
+    </div>
   ) : (
-    <Button onClick={handleSignIn}>Sign In with Google</Button>
+    <div className="flex justify-center">
+      <Button onClick={handleSignIn} className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg text-lg">Sign In with Google</Button>
+    </div>
   )
 }
