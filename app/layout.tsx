@@ -45,7 +45,6 @@ export default function RootLayout({
         <main>
           {children}
         </main>
-        <InstallPWA />
         <Toaster />
         <BottomNavigation />
       </body>

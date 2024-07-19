@@ -10,10 +10,15 @@ export async function GET(request: Request) {
     const supabase = createRouteHandlerClient({ cookies })
     try {
       await supabase.auth.exchangeCodeForSession(code)
-      return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
+      } else {
+        return NextResponse.redirect(new URL('/login', requestUrl.origin))
+      }
     } catch (error) {
       console.error('Error in auth callback:', error)
-      return NextResponse.redirect(new URL('/auth-error', requestUrl.origin))
+      return NextResponse.redirect(new URL('/login', requestUrl.origin))
     }
   }
 
