@@ -102,7 +102,7 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
             <FormItem>
               <FormLabel>Blood Sugar</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Enter blood sugar level" {...field} />
+                <Input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Enter blood sugar level" {...field} />
               </FormControl>
               <FormDescription>Enter your blood sugar level in mg/dL</FormDescription>
               <FormMessage />

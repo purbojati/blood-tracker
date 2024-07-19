@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/drawer"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import ReactMarkdown from 'react-markdown'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Sparkles } from 'lucide-react'
 
 export function AnalysisButton() {
   const [analysis, setAnalysis] = useState<string | null>(null)
@@ -73,8 +73,9 @@ export function AnalysisButton() {
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
-        <Button onClick={handleAnalysis} disabled={isLoading}>
-          {isLoading ? 'Analyzing...' : 'Get AI Analysis'}
+        <Button onClick={handleAnalysis} disabled={isLoading} className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4" />
+          <span className="mr-2">{isLoading ? 'Analyzing...' : 'AI Analysis'}</span>
         </Button>
       </DrawerTrigger>
       <DrawerContent>

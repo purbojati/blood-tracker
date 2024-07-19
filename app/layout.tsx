@@ -23,10 +23,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={cn(
+                className={cn(
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}
+        style={{
+          'user-select': 'none',
+          '-webkit-user-select': 'none',
+          '-khtml-user-select': 'none',
+          '-moz-user-select': 'none',
+          '-ms-user-select': 'none',
+          '-webkit-tap-highlight-color': 'transparent',
+        } as React.CSSProperties}
       >
         
         <main>
