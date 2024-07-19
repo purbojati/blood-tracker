@@ -7,10 +7,6 @@ import { Button } from '@/components/ui/button' // Assuming you're using shadcn/
 export default function AuthError() {
   const router = useRouter()
 
-  const handleReturnToDashboard = () => {
-    router.push('/dashboard')
-  }
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
       <div className="text-center p-8 bg-white rounded-lg shadow-md">
@@ -18,11 +14,11 @@ export default function AuthError() {
         <p className="text-gray-700 mb-6">
           You have successfully logged in.
         </p>
-        <Button 
-          onClick={handleReturnToDashboard}
+        <Button
+          onClick={() => router.push('https://blood-tracker-ai.vercel.app/profile')}
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
         >
-          Go to Dashboard
+          Complete Profile
         </Button>
       </div>
     </div>

@@ -102,7 +102,7 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
             <FormItem>
               <FormLabel>Blood Sugar</FormLabel>
               <FormControl>
-                <Input placeholder="Enter blood sugar level" {...field} />
+                <Input type="number" placeholder="Enter blood sugar level" {...field} />
               </FormControl>
               <FormDescription>Enter your blood sugar level in mg/dL</FormDescription>
               <FormMessage />
@@ -116,7 +116,7 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
             <FormItem>
               <FormLabel>Cholesterol</FormLabel>
               <FormControl>
-                <Input placeholder="Enter cholesterol level" {...field} />
+                <Input type="number" placeholder="Enter cholesterol level" {...field} />
               </FormControl>
               <FormDescription>Enter your cholesterol level in mg/dL</FormDescription>
               <FormMessage />
@@ -130,42 +130,46 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
             <FormItem>
               <FormLabel>Gout</FormLabel>
               <FormControl>
-                <Input placeholder="Enter gout level" {...field} />
+                <Input type="number" placeholder="Enter gout level" {...field} />
               </FormControl>
               <FormDescription>Enter your gout level in mg/dL</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Date</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="time"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Time</FormLabel>
-              <FormControl>
-                <Input type="time" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </Button>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Time</FormLabel>
+                <FormControl>
+                  <Input type="time" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-1">
+          <Button type="submit" disabled={isSubmitting} className="w-full">
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+        </div>
       </form>
     </Form>
   )

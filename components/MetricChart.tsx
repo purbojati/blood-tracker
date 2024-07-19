@@ -26,6 +26,7 @@ interface MetricChartProps {
   trend: number;
 }
 
+
 export function MetricChart({ title, description, data, color, unit, trend }: MetricChartProps) {
   const chartConfig = {
     value: {
