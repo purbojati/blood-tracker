@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -102,9 +101,8 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
             <FormItem>
               <FormLabel>Blood Sugar</FormLabel>
               <FormControl>
-                <Input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Enter blood sugar level" {...field} />
+                <Input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Enter blood sugar level in mg/dL" {...field} />
               </FormControl>
-              <FormDescription>Enter your blood sugar level in mg/dL</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -116,9 +114,8 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
             <FormItem>
               <FormLabel>Cholesterol</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Enter cholesterol level" {...field} />
+                <Input type="number" placeholder="Enter cholesterol level in mg/dL" {...field} />
               </FormControl>
-              <FormDescription>Enter your cholesterol level in mg/dL</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -130,9 +127,8 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
             <FormItem>
               <FormLabel>Gout</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Enter gout level" {...field} />
+                <Input type="number" placeholder="Enter gout level in mg/dL" {...field} />
               </FormControl>
-              <FormDescription>Enter your gout level in mg/dL</FormDescription>
               <FormMessage />
             </FormItem>
           )}
