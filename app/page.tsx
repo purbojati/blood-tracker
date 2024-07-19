@@ -1,61 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { AuthButton } from '@/components/AuthButton'
-import Image from 'next/image'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import Image from 'next/image';
+import { AuthButton } from '@/components/AuthButton';
 
 export default function Home() {
-  const router = useRouter()
-  const supabase = createClientComponentClient()
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const supabase = createClientComponentClient();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkUser = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          throw error;
+        }
         if (session) {
-          router.push('/dashboard')
+          router.push('/dashboard');
         }
       } catch (error) {
-        console.error('Error checking user session:', error)
-        setError('An error occurred while checking your session. Please try again.')
+        console.error('Error checking user session:', error);
+        setError('An error occurred while checking your session. Please try again.');
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    checkUser()
-  }, [supabase, router])
-
-  const handleLogin = async () => {
-    setError(null)
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      })
-      if (error) throw error
-    } catch (error) {
-      console.error('Error logging in:', error)
-      setError('Failed to sign in. Please try again.')
-    }
-  }
+    };
+    checkUser();
+  }, [supabase, router]);
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <p>Loading...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -63,7 +46,10 @@ export default function Home() {
       <Image src="/icon-512x512.png" width={150} height={150} alt="Blood Tracker AI Logo" className="mb-8" />
       <h1 className="text-4xl font-bold mb-4 text-red-800">Blood Tracker AI</h1>
       <p className="text-lg mb-8 text-gray-600">Monitor your health metrics with ease and precision.</p>
+      {/* Assuming AuthButton is a different button for authentication */}
+
       <AuthButton />
+      {error && <p className="text-red-600 mt-4">{error}</p>}
     </div>
-  )
+  );
 }

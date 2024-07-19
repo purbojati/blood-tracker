@@ -3,7 +3,7 @@
 import useSWR from 'swr'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import BloodTest  from '@/types'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { TopNav } from '@/components/TopNav'
 
 const fetcher = async () => {
@@ -27,6 +27,16 @@ export default function History() {
 
   if (error) return <div>Failed to load</div>
   if (!tests) return <div>Loading...</div>
+  if (tests.length === 0) return (
+    <div>
+      <TopNav title="Test History" />
+      <div className="text-center">
+        <h2 className="text-lg font-bold mt-20 mb-4">No Test History Available</h2>
+        <p className="mb-4 text-sm px-4 text-slate-500">It looks like you havent added any blood test records yet. Start tracking your health by adding your first record!</p>
+      
+      </div>
+    </div>
+  );
 
   return (
     <div>

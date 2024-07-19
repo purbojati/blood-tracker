@@ -5,6 +5,8 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Button } from '@/components/ui/button' // Assuming you're using shadcn/ui
 import { useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
+import { generateRandomString } from '@/utils/randomString' // Fixed import to use named import
+import { sha256 } from '@/utils/sha256'
 
 export function AuthButton() {
   const [user, setUser] = useState<User | null>(null)
@@ -23,17 +25,23 @@ export function AuthButton() {
 
   const handleSignIn = async () => {
     try {
+      const codeVerifier = generateRandomString(43); // Updated to use the correct function
+      const codeChallenge = await sha256(codeVerifier);
+  
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
-          skipBrowserRedirect: true,
+          
         }
       });
 
       if (error) throw error;
 
       if (data.url) {
+        // Store the code verifier in localStorage or sessionStorage
+        // so it can be retrieved in the callback
+        sessionStorage.setItem('codeVerifier', codeVerifier);
         window.location.href = data.url;
       }
     } catch (error) {
