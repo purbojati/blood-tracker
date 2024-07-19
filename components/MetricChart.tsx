@@ -5,7 +5,6 @@ import { CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis, ResponsiveCont
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,

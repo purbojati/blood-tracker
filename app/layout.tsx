@@ -1,29 +1,37 @@
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
-import ".//globals.css";
+import "./globals.css";
 import { cn } from "@/lib/utils";
 import { BottomNavigation } from '@/components/BottomNavigation'
 import { Toaster } from "@/components/ui/toaster"
+import { InstallPWA } from '@/components/InstallPWA'
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Blood Tracker AI',
   description: 'Track your blood metrics with AI assistance',
+  themeColor: '#3b82f6',
+  manifest: '/manifest.json',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  icons: [
+    { rel: 'icon', url: '/favicon.ico' },
+    { rel: 'apple-touch-icon', url: '/icon-192x192.png' },
+  ],
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body
-                className={cn(
+        className={cn(
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}
@@ -36,10 +44,10 @@ export default function RootLayout({
           '-webkit-tap-highlight-color': 'transparent',
         } as React.CSSProperties}
       >
-        
         <main>
           {children}
         </main>
+        <InstallPWA />
         <Toaster />
         <BottomNavigation />
       </body>
