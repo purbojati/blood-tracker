@@ -4,7 +4,6 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { BottomNavigation } from '@/components/BottomNavigation'
 import { Toaster } from "@/components/ui/toaster"
-import { AuthButton } from '@/components/AuthButton'
 
 const fontSans = FontSans({
   subsets: ["latin"],

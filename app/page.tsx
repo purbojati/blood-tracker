@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
 import { AuthButton } from '@/components/AuthButton';
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const router = useRouter();
@@ -50,6 +51,9 @@ export default function Home() {
 
       <AuthButton />
       {error && <p className="text-red-600 mt-4">{error}</p>}
+      <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
+        Refresh
+      </Button>
     </div>
   );
 }
