@@ -18,5 +18,5 @@ export async function GET(request: Request) {
   }
 
   console.error('Auth callback: No code provided')
-  return NextResponse.redirect(new URL('/', requestUrl.origin))
+  return NextResponse.redirect(new URL('/login', requestUrl.origin))
 }

@@ -14,9 +14,7 @@ const fontSans = FontSans({
 export const metadata: Metadata = {
   title: 'Blood Tracker AI',
   description: 'Track your blood metrics with AI assistance',
-  themeColor: '#3b82f6',
   manifest: '/manifest.json',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   icons: [
     { rel: 'icon', url: '/favicon.ico' },
     { rel: 'apple-touch-icon', url: '/icon-192x192.png' },

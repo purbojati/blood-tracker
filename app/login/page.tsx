@@ -1,9 +1,9 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 export default function Login() {
   const router = useRouter()
@@ -58,10 +58,11 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-blue-100 to-white">
-      <h1 className="text-4xl font-bold mb-4 text-blue-800">Welcome to Blood Tracker</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-red-100 to-white text-center">
+      <Image src="/icon-512x512.png" width={150} height={150} alt="Blood Tracker AI Logo" className="mb-8" />
+      <h1 className="text-4xl font-bold mb-4 text-red-800">Blood Tracker AI</h1>
       <p className="text-lg mb-8 text-gray-600">Monitor your health metrics with ease and precision.</p>
-      <Button onClick={handleLogin} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg">
+      <Button onClick={handleLogin} className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg text-lg">
         Sign In with Google
       </Button>
       {error && <p className="mt-4 text-red-500">{error}</p>}
