@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "xyz.appmaker.bzarea",
+      "sha256_cert_fingerprints": ["D2:56:E5:7F:9D:A4:E9:7F:79:CC:0F:84:99:E0:62:85:46:52:5B:7E:AA:1F:49:A0:BF:05:D0:0A:6B:75:F0:22"]
+    }
+  }
+]
