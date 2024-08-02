@@ -19,14 +19,14 @@ import { toast } from "@/components/ui/use-toast"
 
 // Define the form schema
 const formSchema = z.object({
-  bloodSugar: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-    message: "Blood sugar must be a positive number",
+  bloodSugar: z.string().nullable().refine((val) => val === null || val === '' || !isNaN(parseFloat(val)), {
+    message: "Blood sugar must be a non-negative number",
   }),
-  cholesterol: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-    message: "Cholesterol must be a positive number",
+  cholesterol: z.string().nullable().refine((val) => val === null || val === '' || !isNaN(parseFloat(val)), {
+    message: "Cholesterol must be a non-negative number",
   }),
-  gout: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-    message: "Gout level must be a positive number",
+  gout: z.string().nullable().refine((val) => val === null || val === '' || !isNaN(parseFloat(val)), {
+    message: "Gout level must be a non-negative number",
   }),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Please enter a valid date",
@@ -35,6 +35,15 @@ const formSchema = z.object({
     message: "Please enter a valid time in HH:MM format",
   }),
 })
+.refine((data) => {
+  return (
+    !!data.bloodSugar ||
+    !!data.cholesterol ||
+    !!data.gout
+  );
+}, {
+  message: 'Please enter at least one value for blood sugar, cholesterol, or uric acid.',
+});
 
 interface DataInputFormProps {
   onSubmitSuccess?: () => void;
@@ -65,9 +74,9 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
         .from('blood_tests')
         .insert({
           user_id: user.id,
-          blood_sugar: parseFloat(values.bloodSugar),
-          cholesterol: parseFloat(values.cholesterol),
-          gout: parseFloat(values.gout),
+          blood_sugar: Number(values.bloodSugar) || 0, // Convert to number
+          cholesterol: Number(values.cholesterol) || 0, // Convert to number
+          gout: Number(values.gout) || 0, // Convert to number
           test_date: `${values.date}T${values.time}:00`,
         })
 
@@ -94,14 +103,21 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
+      <FormField
           control={form.control}
           name="bloodSugar"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Blood Sugar</FormLabel>
+              <FormLabel>Blood Glucose</FormLabel>
               <FormControl>
-                <Input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Enter blood sugar level in mg/dL" {...field} />
+              <Input
+                  type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="Enter blood glucose level in mg/dL"
+                  {...field}
+                  value={field.value ?? ''} // Convert null to empty string
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -114,7 +130,14 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
             <FormItem>
               <FormLabel>Cholesterol</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Enter cholesterol level in mg/dL" {...field} />
+              <Input
+                  type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="Enter cholesterol level in mg/dL"
+                  {...field}
+                  value={field.value ?? ''} // Convert null to empty string
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,9 +148,16 @@ export function DataInputForm({ onSubmitSuccess }: DataInputFormProps) {
           name="gout"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Gout</FormLabel>
+              <FormLabel>Uric Acid</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Enter gout level in mg/dL" {...field} />
+              <Input
+                  type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="Enter uric acid level in mg/dL"
+                  {...field}
+                  value={field.value ?? ''} // Convert null to empty string
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
